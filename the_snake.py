@@ -56,8 +56,10 @@ class GameObject:
 
         :param body_color: Цвет тела объекта.
         """
-        self.position: tuple[int, int] = ((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2))
-        self.body_color: tuple[int, int, int] = body_color
+        self.position: Tuple[int, int] = (
+            (SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)
+        )
+        self.body_color: Tuple[int, int, int] = body_color
 
     def draw(self, surface: pygame.Surface) -> None:
         """
@@ -81,9 +83,7 @@ class Apple(GameObject):
         self.randomize_position()
 
     def randomize_position(self) -> None:
-        """
-        Устанавливает случайное положение яблока на игровом поле.
-        """
+        """Устанавливает случайное положение яблока на игровом поле."""
         self.position = (
             randint(0, GRID_WIDTH - 1) * GRID_SIZE,
             randint(0, GRID_HEIGHT - 1) * GRID_SIZE
