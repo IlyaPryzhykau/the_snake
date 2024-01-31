@@ -246,8 +246,6 @@ def main():
 
         if snake.get_head_position() == apple.position:
             snake.length += 1
-            rock_1.randomize_position()
-            rock_2.randomize_position()
             while (
                     apple.position in snake.positions
                     or apple.position == rock_1.position
