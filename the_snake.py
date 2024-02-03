@@ -93,19 +93,15 @@ class Apple(GameObject):
     def randomize_position(self,
                            occupied_positions: List[Tuple[int, int]]) -> None:
         """Устанавливает случайное положение яблока на игровом поле."""
-        max_attempts: int = 32 * 24 - 1
-        count_attempts: int = 0
-
-        while count_attempts < max_attempts:
-            new_position = (
-                randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-            )
-            if new_position not in occupied_positions:
-                self.position = new_position
-                break
-
-            count_attempts -= 1
+        if len(occupied_positions) < GRID_WIDTH * GRID_HEIGHT:
+            while True:
+                new_position = (
+                    randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                    randint(0, GRID_HEIGHT - 1) * GRID_SIZE
+                )
+                if new_position not in occupied_positions:
+                    self.position = new_position
+                    break
 
     def draw(self, surface, size=(GRID_SIZE, GRID_SIZE)) -> None:
         """Метод отрисовки яблока на игровой поверхности."""
@@ -116,7 +112,7 @@ class Snake(GameObject):
     """Класс, который описывает поведение змеи."""
 
     def __init__(self, position=((SCREEN_WIDTH // 2), (SCREEN_HEIGHT // 2)),
-                 body_color=SNAKE_COLOR) -> None:
+                 body_color=HEAD_SNAKE_COLOR) -> None:
         """
         Инициализация змеи.
 
@@ -163,12 +159,6 @@ class Snake(GameObject):
             pygame.draw.rect(surface, HEAD_SNAKE_COLOR, head_rect)
             pygame.draw.rect(surface, BORDER_COLOR, head_rect, 1)
 
-            # Отрисовка тела змейки
-            for segment in self.positions[1:]:
-                segment_rect = pygame.Rect(segment, size)
-                pygame.draw.rect(surface, self.body_color, segment_rect)
-                pygame.draw.rect(surface, BORDER_COLOR, segment_rect, 1)
-
     def get_head_position(self) -> tuple[int, int]:
         """Возвращает позицию головы змейки."""
         return self.positions[0]
@@ -200,6 +190,7 @@ def main():
     """Основной цикл игры."""
     snake = Snake()
     apple = Apple()
+    screen.fill(BOARD_BACKGROUND_COLOR)
 
     while True:
         clock.tick(SPEED)
@@ -214,8 +205,7 @@ def main():
 
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
-
-        screen.fill(BOARD_BACKGROUND_COLOR)
+            screen.fill(BOARD_BACKGROUND_COLOR)
 
         snake.draw(screen)
         apple.draw(screen)
