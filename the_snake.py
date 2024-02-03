@@ -90,7 +90,8 @@ class Apple(GameObject):
         super().__init__(position, body_color)
         self.randomize_position([])
 
-    def randomize_position(self, occupied_positions: List[Tuple[int, int]]) -> None:
+    def randomize_position(self,
+                           occupied_positions: List[Tuple[int, int]]) -> None:
         """Устанавливает случайное положение яблока на игровом поле."""
         while True:
             new_position = (
