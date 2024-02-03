@@ -93,7 +93,10 @@ class Apple(GameObject):
     def randomize_position(self,
                            occupied_positions: List[Tuple[int, int]]) -> None:
         """Устанавливает случайное положение яблока на игровом поле."""
-        while True:
+        max_attempts: int = 32 * 24 - 1
+        count_attempts: int = 0
+
+        while count_attempts < max_attempts:
             new_position = (
                 randint(0, GRID_WIDTH - 1) * GRID_SIZE,
                 randint(0, GRID_HEIGHT - 1) * GRID_SIZE
@@ -101,6 +104,8 @@ class Apple(GameObject):
             if new_position not in occupied_positions:
                 self.position = new_position
                 break
+
+            count_attempts -= 1
 
     def draw(self, surface, size=(GRID_SIZE, GRID_SIZE)) -> None:
         """Метод отрисовки яблока на игровой поверхности."""
@@ -147,15 +152,22 @@ class Snake(GameObject):
 
     def draw(self, surface, size=(GRID_SIZE, GRID_SIZE)) -> None:
         """Метод отрисовки змейки на игровой поверхности."""
-        for pos in self.positions:
-            rect = pygame.Rect(pos, size)
-            pygame.draw.rect(surface, self.body_color, rect)
-            pygame.draw.rect(surface, BORDER_COLOR, rect, 1)
+        # Затирание хвоста змейки
+        if self.last:
+            tail_rect = pygame.Rect(self.last, size)
+            pygame.draw.rect(surface, BOARD_BACKGROUND_COLOR, tail_rect)
 
-        # Отрисовка головы змейки с измененным цветом
-        head_rect = pygame.Rect(self.positions[0], size)
-        pygame.draw.rect(surface, HEAD_SNAKE_COLOR, head_rect)
-        pygame.draw.rect(surface, BORDER_COLOR, head_rect, 1)
+        # Отрисовка головы змейки
+        if self.positions:
+            head_rect = pygame.Rect(self.positions[0], size)
+            pygame.draw.rect(surface, HEAD_SNAKE_COLOR, head_rect)
+            pygame.draw.rect(surface, BORDER_COLOR, head_rect, 1)
+
+            # Отрисовка тела змейки
+            for segment in self.positions[1:]:
+                segment_rect = pygame.Rect(segment, size)
+                pygame.draw.rect(surface, self.body_color, segment_rect)
+                pygame.draw.rect(surface, BORDER_COLOR, segment_rect, 1)
 
     def get_head_position(self) -> tuple[int, int]:
         """Возвращает позицию головы змейки."""
@@ -189,9 +201,6 @@ def main():
     snake = Snake()
     apple = Apple()
 
-    # Список занятых позиций на игровом поле.
-    occupied_positions = [snake.position] + snake.positions
-
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
@@ -201,8 +210,7 @@ def main():
 
         if snake.get_head_position() == apple.position:
             snake.length += 1
-            occupied_positions.append(snake.position)
-            apple.randomize_position(occupied_positions)
+            apple.randomize_position(snake.positions)
 
         if snake.get_head_position() in snake.positions[1:]:
             snake.reset()
